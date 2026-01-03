@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de ROI - Tess</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z" fill="rgba(255,255,255,0.1)"/></svg>') no-repeat bottom;
+      background-size: cover;
+      pointer-events: none;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .tess-logo {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .language-selector {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .language-selector button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+
+    .language-selector button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .language-selector button.active {
+      background: white;
+      color: #2d3748;
+      border-color: white;
+    }
+
+    .content {
+      padding: 40px 30px;
+    }
+
+    .form-section {
+      margin-bottom: 40px;
+    }
+
+    .form-section h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #2d3748;
+      box-shadow: 0 0 0 3px rgba(45, 55, 72, 0.1);
+    }
+
+    .form-group .help-text {
+      font-size: 12px;
+      color: #718096;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    .scenario-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .scenario-btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px;
+      border: 2px solid #cbd5e0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 13px;
+    }
+
+    .scenario-btn:hover {
+      border-color: #2d3748;
+      background: #f7fafc;
+    }
+
+    .scenario-btn.active {
+      background: #2d3748;
+      color: white;
+      border-color: #2d3748;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .slider-container input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: #cbd5e0;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #2d3748;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(45, 55, 72, 0.3);
+    }
+
+    .slider-container input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #2d3748;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(45, 55, 72, 0.3);
+    }
+
+    .slider-value {
+      min-width: 60px;
+      text-align: right;
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 16px;
+    }
+
+    .optional-section {
+      background: #f7fafc;
+      border-left: 4px solid #cbd5e0;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .optional-section input[type="checkbox"] {
+      margin-right: 10px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #2d3748;
+    }
+
+    .optional-section label {
+      margin: 0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 15px;
+      color: #2d3748;
+    }
+
+    .optional-content {
+      margin-top: 15px;
+      display: none;
+      padding: 15px 0;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .optional-content.show {
+      display: block;
+    }
+
+    .pricing-model-toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .pricing-model-toggle button {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #cbd5e0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 13px;
+    }
+
+    .pricing-model-toggle button:hover {
+      border-color: #2d3748;
+      background: #f7fafc;
+    }
+
+    .pricing-model-toggle button.active {
+      background: #2d3748;
+      color: white;
+      border-color: #2d3748;
+    }
+
+    .pricing-fields {
+      display: none;
+    }
+
+    .pricing-fields.show {
+      display: block;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+      }
+      to {
+        opacity: 1;
+        max-height: 500px;
+      }
+    }
+
+    .btn-calculate {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+
+    .btn-calculate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(45, 55, 72, 0.3);
+    }
+
+    .btn-calculate:active {
+      transform: translateY(0);
+    }
+
+    .btn-calculate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Results Section */
+    .results-section {
+      display: none;
+      margin-top: 40px;
+      padding: 30px;
+      background: #f7fafc;
+      border-radius: 12px;
+    }
+
+    .results-section.show {
+      display: block;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .results-section h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .result-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #cbd5e0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+    }
+
+    .result-card:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .result-card h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .result-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d3748;
+      word-break: break-word;
+    }
+
+    .result-card.positive {
+      border-left-color: #48bb78;
+    }
+
+    .result-card.warning {
+      border-left-color: #f6ad55;
+    }
+
+    .breakdown-chart {
+      margin: 30px 0;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+    }
+
+    .breakdown-chart h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 20px;
+    }
+
+    .breakdown-item {
+      margin-bottom: 20px;
+    }
+
+    .breakdown-label {
+      font-size: 14px;
+      color: #2d3748;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: 500;
+    }
+
+    .breakdown-bar {
+      width: 100%;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .breakdown-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2d3748, #4a5568);
+      border-radius: 4px;
+      transition: width 0.5s ease-out;
+    }
+
+    .calculation-detail {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .calculation-detail h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 15px;
+    }
+
+    .formula {
+      background: #edf2f7;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      color: #2d3748;
+      margin-bottom: 10px;
+      overflow-x: auto;
+      border-left: 3px solid #2d3748;
+      line-height: 1.6;
+    }
+
+    .btn-download {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+    }
+
+    .btn-download:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #2d3748;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: #fed7d7;
+      color: #c53030;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #c53030;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .success-message {
+      background: #c6f6d5;
+      color: #22543d;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #48bb78;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #718096;
+      line-height: 1.6;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 30px 20px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .header p {
+        font-size: 14px;
+      }
+
+      .content {
+        padding: 20px;
+      }
+
+      .language-selector {
+        top: 10px;
+        right: 10px;
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .scenario-buttons {
+        flex-direction: column;
+      }
+
+      .scenario-btn {
+        min-width: auto;
+      }
+
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+
+      .pricing-model-toggle {
+        flex-direction: column;
+      }
+
+      .pricing-model-toggle button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="language-selector">
+    <button class="lang-btn active" data-lang="pt-BR">🇧🇷 PT</button>
+    <button class="lang-btn" data-lang="en">🇺🇸 EN</button>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div class="header-content">
+        <div class="tess-logo">📊 Tess</div>
+        <h1 data-text="calculator_title">Calculadora de ROI</h1>
+        <p data-text="calculator_subtitle">Estime o retorno anual da Tess no seu contexto em 5 minutos</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="error" id="errorBox"></div>
+      <div class="success-message" id="successBox"></div>
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p data-text="calculating">Calculando...</p>
+      </div>
+
+      <form id="calculatorForm">
+        <!-- SEÇÃO 1: TEMPO -->
+        <div class="form-section">
+          <h3 data-text="section_time">1. Tempo Economizado</h3>
+
+          <div class="form-group">
+            <label for="usuarioAtivos" data-text="label_users">Usuários ativos</label>
+            <input type="number" id="usuarioAtivos" name="U" placeholder="Ex: 30" min="1" required>
+            <div class="help-text" data-text="help_users">Quantas pessoas usam a Tess regularmente na sua equipe?</div>
+          </div>
+
+          <div class="form-group">
+            <label for="taxaAdocao" data-text="label_adoption">Taxa de adoção real (%)</label>
+            <div class="slider-container">
+              <input type="range" id="taxaAdocao" name="A" min="0" max="100" value="70" step="5">
+              <span class="slider-value" id="taxaAdocaoValue">70%</span>
+            </div>
+            <div class="help-text" data-text="help_adoption">Qual porcentagem da equipe usa regularmente (60–90% é comum)</div>
+          </div>
+
+          <div class="form-group">
+            <label data-text="label_hours">Horas poupadas por usuário por semana</label>
+            <div class="scenario-buttons">
+              <button type="button" class="scenario-btn" data-hours="0.5" data-text="scenario_conservative">📉 Conservador (0,5h)</button>
+              <button type="button" class="scenario-btn active" data-hours="1.5" data-text="scenario_base">📊 Base (1,5h)</button>
+              <button type="button" class="scenario-btn" data-hours="2.5" data-text="scenario_aggressive">📈 Agressivo (2,5h)</button>
+            </div>
+            <input type="number" id="horasPoupadas" name="H" placeholder="1.5" step="0.1" value="1.5" min="0.1" required>
+            <div class="help-text" data-text="help_hours">Quanto tempo por semana você economiza com a Tess? (edite acima)</div>
+          </div>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label for="semanasPorAno" data-text="label_weeks">Semanas por ano</label>
+              <input type="number" id="semanasPorAno" name="W" placeholder="50" value="50" min="1" max="52" required>
+            </div>
+
+            <div class="form-group">
+              <label for="custoHora" data-text="label_cost_hour">Custo médio/hora (R$ ou $)</label>
+              <input type="number" id="custoHora" name="C" placeholder="Ex: 90" step="0.01" min="0.01" required>
+              <div class="help-text" data-text="help_cost_hour">Salário + encargos + overhead</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="capacidadeUtil" data-text="label_useful_capacity">% tempo → capacidade útil (%)</label>
+            <div class="slider-container">
+              <input type="range" id="capacidadeUtil" name="R" min="0" max="100" value="50" step="5">
+              <span class="slider-value" id="capacidadeUtilValue">50%</span>
+            </div>
+            <div class="help-text" data-text="help_useful_capacity">Nem todo tempo economizado vira produtividade (30–70% é realista)</div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 2: QUALIDADE (OPCIONAL) -->
+        <div class="form-section">
+          <div class="optional-section">
+            <label>
+              <input type="checkbox" id="checkRetrabalho">
+              <span data-text="section_rework">2. Retrabalho Reduzido (opcional)</span>
+            </label>
+          </div>
+
+          <div id="retrabalhoContent" class="optional-content">
+            <div class="two-column">
+              <div class="form-group">
+                <label for="retrabalhoAntes" data-text="label_rework_before">Horas de retrabalho/mês (antes)</label>
+                <input type="number" id="retrabalhoAntes" name="HRb" placeholder="Ex: 40" step="0.1" min="0">
+                <div class="help-text" data-text="help_rework_before">Quanto tempo por mês era gasto em retrabalho/revisões?</div>
+              </div>
+
+              <div class="form-group">
+                <label for="retrabalhoDepois" data-text="label_rework_after">Horas de retrabalho/mês (depois)</label>
+                <input type="number" id="retrabalhoDepois" name="HRa" placeholder="Ex: 20" step="0.1" min="0">
+                <div class="help-text" data-text="help_rework_after">Quanto você economiza agora com retrabalho reduzido?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 3: ERROS (OPCIONAL) -->
+        <div class="form-section">
+          <div class="optional-section">
+            <label>
+              <input type="checkbox" id="checkErros">
+              <span data-text="section_errors">3. Erros Evitados (opcional)</span>
+            </label>
+          </div>
+
+          <div id="errosContent" class="optional-content">
+            <div class="two-column">
+              <div class="form-group">
+                <label for="errosAntes" data-text="label_errors_before">Erros/incidentes por mês (antes)</label>
+                <input type="number" id="errosAntes" name="Eb" placeholder="Ex: 5" step="0.1" min="0">
+              </div>
+
+              <div class="form-group">
+                <label for="errosDepois" data-text="label_errors_after">Erros/incidentes por mês (depois)</label>
+                <input type="number" id="errosDepois" name="Ea" placeholder="Ex: 1" step="0.1" min="0">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="custoErro" data-text="label_cost_error">Custo médio por erro (R$ ou $)</label>
+              <input type="number" id="custoErro" name="Ce" placeholder="Ex: 500" step="0.01" min="0">
+              <div class="help-text" data-text="help_cost_error">Horas de correção + impacto operacional</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO 4: CUSTOS TESS -->
+        <div class="form-section">
+          <h3 data-text="section_tess_cost">4. Custos Tess</h3>
+
+          <div class="pricing-model-toggle">
+            <button type="button" class="pricing-toggle active" data-model="per_user" data-text="pricing_per_user">Por usuário</button>
+            <button type="button" class="pricing-toggle" data-model="fixed" data-text="pricing_fixed">Mensalidade fixa</button>
+          </div>
+
+          <!-- Por usuário -->
+          <div id="pricingPerUser" class="pricing-fields show">
+            <div class="two-column">
+              <div class="form-group">
+                <label for="precoUsuario" data-text="label_price_user">Preço/usuário/mês (R$ ou $)</label>
+                <input type="number" id="precoUsuario" name="Puser" placeholder="Ex: 50" step="0.01" min="0">
+              </div>
+
+              <div class="form-group">
+                <label for="usuariosCobrados" data-text="label_users_charged">Usuários cobrados</label>
+                <input type="number" id="usuariosCobrados" name="Uc" placeholder="Ex: 30" min="1">
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensalidade fixa -->
+          <div id="pricingFixed" class="pricing-fields">
+            <div class="form-group">
+              <label for="mensalidadeFixa" data-text="label_monthly_fee">Mensalidade fixa (R$ ou $)</label>
+              <input type="number" id="mensalidadeFixa" name="Pf" placeholder="Ex: 1500" step="0.01" min="0">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-calculate" data-text="btn_calculate">Calcular ROI</button>
+      </form>
+
+      <!-- RESULTADOS -->
+      <div id="resultsSection" class="results-section">
+        <h2 data-text="results_title">Seu ROI Anual</h2>
+
+        <div class="results-grid">
+          <div class="result-card positive">
+            <h4 data-text="result_benefit">Benefício anual</h4>
+            <div class="value" id="resultBeneficio">R$ 0</div>
+          </div>
+
+          <div class="result-card">
+            <h4 data-text="result_cost">Custo anual Tess</h4>
+            <div class="value" id="resultCusto">R$ 0</div>
+          </div>
+
+          <div class="result-card positive">
+            <h4 data-text="result_net_gain">Ganho líquido anual</h4>
+            <div class="value" id="resultGanhoLiquido">R$ 0</div>
+          </div>
+
+          <div class="result-card positive">
+            <h4 data-text="result_roi">ROI anual</h4>
+            <div class="value" id="resultROI">0%</div>
+          </div>
+
+          <div class="result-card">
+            <h4 data-text="result_payback">Payback</h4>
+            <div class="value" id="resultPayback">0 meses</div>
+          </div>
+        </div>
+
+        <div class="breakdown-chart">
+          <h4 data-text="breakdown_title">De onde veio o ROI</h4>
+          
+          <div class="breakdown-item">
+            <div class="breakdown-label">
+              <span data-text="breakdown_time">Tempo economizado</span>
+              <span id="breakdownTempoValue">R$ 0</span>
+            </div>
+            <div class="breakdown-bar">
+              <div class="breakdown-bar-fill" id="breakdownTempoBar" style="width: 33.3%"></div>
+            </div>
+          </div>
+
+          <div class="breakdown-item">
+            <div class="breakdown-label">
+              <span data-text="breakdown_rework">Retrabalho reduzido</span>
+              <span id="breakdownRetrabalhoValue">R$ 0</span>
+            </div>
+            <div class="breakdown-bar">
+              <div class="breakdown-bar-fill" id="breakdownRetrabalhoBar" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="breakdown-item">
+            <div class="breakdown-label">
+              <span data-text="breakdown_errors">Erros evitados</span>
+              <span id="breakdownErrosValue">R$ 0</span>
+            </div>
+            <div class="breakdown-bar">
+              <div class="breakdown-bar-fill" id="breakdownErrosBar" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calculation-detail">
+          <h4 data-text="calculation_detail">Memória de Cálculo</h4>
+          <div id="calculationDetail"></div>
+        </div>
+
+        <button type="button" class="btn-download" id="btnDownload" data-text="btn_download">⬇️ Baixar Relatório em PDF</button>
+
+        <div class="footer-text" data-text="footer_text">Quer validar esses números? Responda o e-mail com 2 linhas descrevendo como usa a Tess.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configuração
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFtTy-XmffIwY-eGz4vKru6kUBzZNIFleGCZNerQ5ic4glrs90QXlCOoAQj9XKOTJeMg/exec";
+
+    // Traduções completas
+    const translations = {
+      "pt-BR": {
+        calculator_title: "Calculadora de ROI",
+        calculator_subtitle: "Estime o retorno anual da Tess no seu contexto em 5 minutos",
+        section_time: "1. Tempo Economizado",
+        label_users: "Usuários ativos",
+        help_users: "Quantas pessoas usam a Tess regularmente na sua equipe?",
+        label_adoption: "Taxa de adoção real (%)",
+        help_adoption: "Qual porcentagem da equipe usa regularmente (60–90% é comum)",
+        label_hours: "Horas poupadas por usuário por semana",
+        scenario_conservative: "📉 Conservador (0,5h)",
+        scenario_base: "📊 Base (1,5h)",
+        scenario_aggressive: "📈 Agressivo (2,5h)",
+        help_hours: "Quanto tempo por semana você economiza com a Tess? (edite acima)",
+        label_weeks: "Semanas por ano",
+        label_cost_hour: "Custo médio/hora (R$ ou $)",
+        help_cost_hour: "Salário + encargos + overhead (estimativa interna)",
+        label_useful_capacity: "% tempo → capacidade útil (%)",
+        help_useful_capacity: "Nem todo tempo economizado vira produtividade (30–70% é realista)",
+        section_rework: "2. Retrabalho Reduzido (opcional)",
+        label_rework_before: "Horas de retrabalho/mês (antes)",
+        help_rework_before: "Quanto tempo por mês era gasto em retrabalho/revisões?",
+        label_rework_after: "Horas de retrabalho/mês (depois)",
+        help_rework_after: "Quanto você economiza agora com retrabalho reduzido?",
+        section_errors: "3. Erros Evitados (opcional)",
+        label_errors_before: "Erros/incidentes por mês (antes)",
+        label_errors_after: "Erros/incidentes por mês (depois)",
+        label_cost_error: "Custo médio por erro (R$ ou $)",
+        help_cost_error: "Horas de correção + impacto operacional",
+        section_tess_cost: "4. Custos Tess",
+        pricing_per_user: "Por usuário",
+        pricing_fixed: "Mensalidade fixa",
+        label_price_user: "Preço/usuário/mês (R$ ou $)",
+        label_users_charged: "Usuários cobrados",
+        label_monthly_fee: "Mensalidade fixa (R$ ou $)",
+        btn_calculate: "Calcular ROI",
+        results_title: "Seu ROI Anual",
+        result_benefit: "Benefício anual",
+        result_cost: "Custo anual Tess",
+        result_net_gain: "Ganho líquido anual",
+        result_roi: "ROI anual",
+        result_payback: "Payback",
+        breakdown_title: "De onde veio o ROI",
+        breakdown_time: "Tempo economizado",
+        breakdown_rework: "Retrabalho reduzido",
+        breakdown_errors: "Erros evitados",
+        calculation_detail: "Memória de Cálculo",
+        btn_download: "⬇️ Baixar Relatório em PDF",
+        footer_text: "Quer validar esses números? Responda o e-mail com 2 linhas descrevendo como usa a Tess.",
+        calculating: "Calculando...",
+      },
+      en: {
+        calculator_title: "ROI Calculator",
+        calculator_subtitle: "Estimate your annual Tess return in 5 minutes",
+        section_time: "1. Time Saved",
+        label_users: "Active users",
+        help_users: "How many people regularly use Tess in your team?",
+        label_adoption: "Actual adoption rate (%)",
+        help_adoption: "What percentage of the team uses it regularly (60–90% is common)",
+        label_hours: "Hours saved per user per week",
+        scenario_conservative: "📉 Conservative (0.5h)",
+        scenario_base: "📊 Base (1.5h)",
+        scenario_aggressive: "📈 Aggressive (2.5h)",
+        help_hours: "How much time per week do you save with Tess? (edit above)",
+        label_weeks: "Weeks per year",
+        label_cost_hour: "Average cost per hour (R$ or $)",
+        help_cost_hour: "Salary + benefits + overhead (internal estimate)",
+        label_useful_capacity: "% time → useful capacity (%)",
+        help_useful_capacity: "Not all saved time becomes productivity (30–70% is realistic)",
+        section_rework: "2. Rework Reduced (optional)",
+        label_rework_before: "Rework hours per month (before)",
+        help_rework_before: "How much time per month was spent on rework/reviews?",
+        label_rework_after: "Rework hours per month (after)",
+        help_rework_after: "How much do you save now with reduced rework?",
+        section_errors: "3. Errors Avoided (optional)",
+        label_errors_before: "Errors/incidents per month (before)",
+        label_errors_after: "Errors/incidents per month (after)",
+        label_cost_error: "Average cost per error (R$ or $)",
+        help_cost_error: "Correction hours + operational impact",
+        section_tess_cost: "4. Tess Costs",
+        pricing_per_user: "Per user",
+        pricing_fixed: "Fixed monthly",
+        label_price_user: "Price per user per month (R$ or $)",
+        label_users_charged: "Users charged",
+        label_monthly_fee: "Fixed monthly fee (R$ or $)",
+        btn_calculate: "Calculate ROI",
+        results_title: "Your Annual ROI",
+        result_benefit: "Annual benefit",
+        result_cost: "Annual Tess cost",
+        result_net_gain: "Annual net gain",
+        result_roi: "Annual ROI",
+        result_payback: "Payback",
+        breakdown_title: "Where the ROI comes from",
+        breakdown_time: "Time saved",
+        breakdown_rework: "Rework reduced",
+        breakdown_errors: "Errors avoided",
+        calculation_detail: "Calculation Detail",
+        btn_download: "⬇️ Download PDF Report",
+        footer_text: "Want to validate these numbers? Reply to the email with 2 lines describing how you use Tess.",
+        calculating: "Calculating...",
+      }
+    };
+
+    // Estado
+    let currentLanguage = "pt-BR";
+    let calculationData = null;
+    let pdfUrl = null;
+
+    // Detectar RID da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const rid = urlParams.get("rid");
+
+    if (!rid) {
+      showError("RID não encontrado na URL. Verifique se você está usando o link correto do e-mail.");
+      document.getElementById("calculatorForm").style.display = "none";
+    } else {
+      validateAndLoadCalculator();
+    }
+
+    // Validar RID e carregar
+    async function validateAndLoadCalculator() {
+      try {
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=validate&rid=${rid}`);
+        const data = await response.json();
+
+        if (!data.valid) {
+          showError("Link expirado ou inválido. Entre em contato com a Tess em hello@tess.page");
+          document.getElementById("calculatorForm").style.display = "none";
+          return;
+        }
+
+        currentLanguage = data.lang || "pt-BR";
+        updateLanguage();
+      } catch (error) {
+        showError("Erro ao validar link: " + error.message);
+      }
+    }
+
+    // Atualizar idioma
+    function updateLanguage() {
+      const t = translations[currentLanguage];
+      document.querySelectorAll("[data-text]").forEach(el => {
+        const key = el.dataset.text;
+        if (t[key]) el.textContent = t[key];
+      });
+      document.documentElement.lang = currentLanguage;
+    }
+
+    // Mensagens de erro e sucesso
+    function showError(msg) {
+      const errorBox = document.getElementById("errorBox");
+      errorBox.textContent = msg;
+      errorBox.classList.add("show");
+      setTimeout(() => errorBox.classList.remove("show"), 5000);
+    }
+
+    function hideError() {
+      document.getElementById("errorBox").classList.remove("show");
+    }
+
+    // Sliders
+    document.getElementById("taxaAdocao").addEventListener("input", (e) => {
+      document.getElementById("taxaAdocaoValue").textContent = e.target.value + "%";
+    });
+
+    document.getElementById("capacidadeUtil").addEventListener("input", (e) => {
+      document.getElementById("capacidadeUtilValue").textContent = e.target.value + "%";
+    });
+
+    // Botões de cenário
+    document.querySelectorAll(".scenario-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.querySelectorAll(".scenario-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("horasPoupadas").value = btn.dataset.hours;
+      });
+    });
+
+    // Checkboxes opcionais
+    document.getElementById("checkRetrabalho").addEventListener("change", (e) => {
+      document.getElementById("retrabalhoContent").classList.toggle("show", e.target.checked);
+    });
+
+    document.getElementById("checkErros").addEventListener("change", (e) => {
+      document.getElementById("errosContent").classList.toggle("show", e.target.checked);
+    });
+
+    // Toggle de pricing model
+    document.querySelectorAll(".pricing-toggle").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.querySelectorAll(".pricing-toggle").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const model = btn.dataset.model;
+        document.getElementById("pricingPerUser").classList.toggle("show", model === "per_user");
+        document.getElementById("pricingFixed").classList.toggle("show", model === "fixed");
+      });
+    });
+
+    // Language selector
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentLanguage = btn.dataset.lang;
+        updateLanguage();
+      });
+    });
+
+    // Submit do formulário
+    document.getElementById("calculatorForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideError();
+
+      const calculateBtn = e.target.querySelector('button[type="submit"]');
+      calculateBtn.disabled = true;
+
+      document.getElementById("loading").classList.add("show");
+      document.getElementById("resultsSection").classList.remove("show");
+
+      try {
+        const formData = new FormData(document.getElementById("calculatorForm"));
+        const inputs = {
+          rid: rid,
+          lang: currentLanguage,
+          U: parseFloat(formData.get("U")) || 0,
+          A: parseFloat(formData.get("A")) || 0,
+          H: parseFloat(formData.get("H")) || 0,
+          W: parseFloat(formData.get("W")) || 50,
+          C: parseFloat(formData.get("C")) || 0,
+          R: parseFloat(formData.get("R")) || 0,
+          HRb: parseFloat(formData.get("HRb")) || 0,
+          HRa: parseFloat(formData.get("HRa")) || 0,
+          Eb: parseFloat(formData.get("Eb")) || 0,
+          Ea: parseFloat(formData.get("Ea")) || 0,
+          Ce: parseFloat(formData.get("Ce")) || 0,
+          pricing_model: document.querySelector(".pricing-toggle.active").dataset.model === "per_user" ? "per_user" : "fixed",
+          Puser: parseFloat(formData.get("Puser")) || 0,
+          Uc: parseFloat(formData.get("Uc")) || 0,
+          Pf: parseFloat(formData.get("Pf")) || 0
+        };
+
+        // Validar entrada
+        if (inputs.U <= 0 || inputs.C <= 0) {
+          throw new Error("Por favor, preencha todos os campos obrigatórios com valores válidos.");
+        }
+
+        const response = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ rid, inputs }),
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+          showError(result.error);
+        } else {
+          calculationData = result;
+          pdfUrl = result.pdf_url;
+          displayResults(result.outputs, result.calculation_detail);
+        }
+      } catch (error) {
+        showError("Erro ao calcular: " + error.message);
+      } finally {
+        document.getElementById("loading").classList.remove("show");
+        calculateBtn.disabled = false;
+      }
+    });
+
+    // Exibir resultados
+    function displayResults(outputs, calcDetail) {
+      const curr = currentLanguage === "en" ? "$" : "R$";
+
+      document.getElementById("resultBeneficio").textContent = formatCurrency(outputs.beneficio_total);
+      document.getElementById("resultCusto").textContent = formatCurrency(outputs.custo_anual);
+      document.getElementById("resultGanhoLiquido").textContent = formatCurrency(outputs.ganho_liquido);
+      document.getElementById("resultROI").textContent = outputs.roi_percent + "%";
+      document.getElementById("resultPayback").textContent = outputs.payback_months + " " + (currentLanguage === "en" ? "months" : "meses");
+
+      document.getElementById("breakdownTempoValue").textContent = formatCurrency(outputs.breakdown.tempo);
+      document.getElementById("breakdownRetrabalhoValue").textContent = formatCurrency(outputs.breakdown.retrabalho);
+      document.getElementById("breakdownErrosValue").textContent = formatCurrency(outputs.breakdown.erros);
+
+      // Atualizar barras de breakdown
+      const total = outputs.beneficio_total || 1;
+      const tempoWidth = (outputs.breakdown.tempo / total) * 100;
+      const retrabalhoWidth = (outputs.breakdown.retrabalho / total) * 100;
+      const errosWidth = (outputs.breakdown.erros / total) * 100;
+
+      setTimeout(() => {
+        document.getElementById("breakdownTempoBar").style.width = tempoWidth + "%";
+        document.getElementById("breakdownRetrabalhoBar").style.width = retrabalhoWidth + "%";
+        document.getElementById("breakdownErrosBar").style.width = errosWidth + "%";
+      }, 100);
+
+      // Exibir cálculos
+      let detailHTML = "";
+      if (calcDetail.tempo) {
+        detailHTML += `<div class="formula"><strong>${currentLanguage === "en" ? "Time saved:" : "Tempo economizado:"}</strong> ${calcDetail.tempo}</div>`;
+      }
+      if (calcDetail.retrabalho && calcDetail.retrabalho !== "N/A") {
+        detailHTML += `<div class="formula"><strong>${currentLanguage === "en" ? "Rework reduced:" : "Retrabalho reduzido:"}</strong> ${calcDetail.retrabalho}</div>`;
+      }
+      if (calcDetail.erros && calcDetail.erros !== "N/A") {
+        detailHTML += `<div class="formula"><strong>${currentLanguage === "en" ? "Errors avoided:" : "Erros evitados:"}</strong> ${calcDetail.erros}</div>`;
+      }
+      document.getElementById("calculationDetail").innerHTML = detailHTML;
+
+      // Download
+      const downloadBtn = document.getElementById("btnDownload");
+      downloadBtn.disabled = false;
+      downloadBtn.onclick = () => {
+        if (pdfUrl) {
+          window.open(pdfUrl, "_blank");
+        } else {
+          showError("URL do PDF não disponível");
+        }
+      };
+
+      document.getElementById("resultsSection").classList.add("show");
+      window.scrollTo({ 
+        top: document.getElementById("resultsSection").offsetTop - 100, 
+        behavior: "smooth" 
+      });
+    }
+
+    function formatCurrency(value) {
+      const curr = currentLanguage === "en" ? "$" : "R$";
+      return curr + " " + Math.round(value).toLocaleString(currentLanguage === "en" ? "en-US" : "pt-BR");
+    }
+  </script>
+</body>
+</html>
