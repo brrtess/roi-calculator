@@ -1223,9 +1223,21 @@
       });
     }
 
-    function formatCurrency(value) {
-      const curr = currentLanguage === "en" ? "$" : "R$";
-      return curr + " " + Math.round(value).toLocaleString(currentLanguage === "en" ? "en-US" : "pt-BR");
+    function getCurrencyConfig() {
+      if (currentLanguage === "en") {
+      return { locale: "en-US", currency: "USD" };
+      }
+      return { locale: "pt-BR", currency: "BRL" };
+      }
+      
+      function formatCurrency(value) {
+      const { locale, currency } = getCurrencyConfig();
+      const safe = Number.isFinite(value) ? value : 0;
+      return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0
+      }).format(Math.round(safe));
     }
   </script>
 </body>
