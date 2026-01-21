@@ -1176,9 +1176,23 @@
       document.getElementById("resultROI").textContent = outputs.roi_percent + "%";
       document.getElementById("resultPayback").textContent = outputs.payback_months + " " + (currentLanguage === "en" ? "months" : "meses");
 
-      document.getElementById("breakdownTempoValue").textContent = formatCurrency(outputs.breakdown.tempo);
-      document.getElementById("breakdownRetrabalhoValue").textContent = formatCurrency(outputs.breakdown.retrabalho);
-      document.getElementById("breakdownErrosValue").textContent = formatCurrency(outputs.breakdown.erros);
+      // Renderizar com unidades + moeda
+      const tempoDisplay = (outputs.breakdown_units?.tempo_horas_total 
+        ? `${Math.round(outputs.breakdown_units.tempo_horas_total)} horas/ano → ${formatCurrency(outputs.breakdown.tempo)}`
+        : formatCurrency(outputs.breakdown.tempo));
+
+      const retrabalhoDisplay = (outputs.breakdown_units?.retrabalho_horas
+        ? `${Math.round(outputs.breakdown_units.retrabalho_horas)} horas/ano → ${formatCurrency(outputs.breakdown.retrabalho)}`
+        : formatCurrency(outputs.breakdown.retrabalho));
+
+      const errosDisplay = (outputs.breakdown_units?.erros_evitados
+        ? `${Math.round(outputs.breakdown_units.erros_evitados)} incidentes/ano → ${formatCurrency(outputs.breakdown.erros)}`
+        : formatCurrency(outputs.breakdown.erros));
+
+      document.getElementById("breakdownTempoValue").textContent = tempoDisplay;
+      document.getElementById("breakdownRetrabalhoValue").textContent = retrabalhoDisplay;
+      document.getElementById("breakdownErrosValue").textContent = errosDisplay;
+
 
       // Atualizar barras de breakdown
       const total = outputs.beneficio_total || 1;
