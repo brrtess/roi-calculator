@@ -1209,11 +1209,13 @@
       const downloadBtn = document.getElementById("btnDownload");
       downloadBtn.disabled = false;
       downloadBtn.onclick = () => {
-        if (pdfUrl) {
-          window.open(pdfUrl, "_blank");
-        } else {
-          showError("URL do PDF não disponível");
+        if (!pdfUrl || typeof pdfUrl !== "string" || !pdfUrl.startsWith("http")) {
+          showError(currentLanguage === "en"
+          ? "PDF link is not available. Please calculate again."
+          : "O link do PDF não está disponível. Clique em Calcular novamente.");
+          return;
         }
+        window.open(pdfUrl, "_blank");
       };
 
       document.getElementById("resultsSection").classList.add("show");
