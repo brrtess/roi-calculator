@@ -1220,12 +1220,14 @@
 
       // Download
       document.getElementById("btnDownload").onclick = () => {
-        if (!pdfUrl) {
-          showError("PDF não disponível");
+        if (!pdfUrl || !pdfUrl.startsWith("https://drive.google.com")) {
+          showError(currentLanguage === "en"
+            ? "PDF not available"
+            : "PDF não disponível");
           return;
         }
-        // Redireciona direto para o endpoint do Apps Script (que vai fazer o redirect para Drive)
-        window.location.href = pdfUrl;
+        // Abre direto o link do Drive (começa download automaticamente)
+        window.open(pdfUrl, "_blank");
       };
 
       document.getElementById("resultsSection").classList.add("show");
