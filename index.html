@@ -1220,16 +1220,33 @@
       document.getElementById("calculationDetail").innerHTML = detailHTML;
 
       // Download
-      const downloadBtn = document.getElementById("btnDownload");
-      downloadBtn.disabled = false;
-      downloadBtn.onclick = () => {
+      document.getElementById("btnDownload").onclick = async () => {
         if (!pdfUrl || typeof pdfUrl !== "string" || !pdfUrl.startsWith("http")) {
           showError(currentLanguage === "en"
-          ? "PDF link is not available. Please calculate again."
-          : "O link do PDF não está disponível. Clique em Calcular novamente.");
+            ? "PDF link is not available. Please calculate again."
+            : "O link do PDF não está disponível. Clique em Calcular novamente.");
           return;
         }
-        window.open(pdfUrl, "_blank");
+      
+        // Chamar o endpoint de download que vai retornar o link do Drive
+        try {
+          const response = await fetch(pdfUrl);
+          const data = await response.json();
+      
+          if (data.error) {
+            showError(currentLanguage === "en"
+              ? "Error: " + data.error
+              : "Erro: " + data.error);
+            return;
+          }
+      
+          // Redirecionar para o link de download do Drive
+          if (data.download_url) {
+            window.open(data.download_url, "_blank");
+          }
+        } catch (error) {
+          showError("Erro ao baixar: " + error.message);
+        }
       };
 
       document.getElementById("resultsSection").classList.add("show");
